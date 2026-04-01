@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lorvas Distribuidora – Catálogo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0d0d0d; --surface: #161616; --card: #1e1e1e;
+      --gold: #c9a84c; --gold-light: #e8c97a; --text: #f0ece4;
+      --muted: #888; --border: #2a2a2a; --radius: 12px; --green: #25d366;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; min-height:100vh; }
+
+    /* HERO */
+    header { position:relative; padding:80px 40px 60px; text-align:center; overflow:hidden; border-bottom:1px solid var(--border); }
+    header::before {
+      content:''; position:absolute; inset:0; pointer-events:none;
+      background: radial-gradient(ellipse 70% 60% at 50% 0%, rgba(201,168,76,.18) 0%, transparent 70%),
+        repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(201,168,76,.04) 39px, rgba(201,168,76,.04) 40px);
+    }
+    .logo-badge {
+      display:inline-flex; align-items:center; gap:10px; margin-bottom:28px;
+      background:rgba(201,168,76,.12); border:1px solid rgba(201,168,76,.3);
+      padding:6px 18px 6px 10px; border-radius:999px;
+      font-size:.78rem; font-weight:500; letter-spacing:.12em; text-transform:uppercase; color:var(--gold-light);
+    }
+    .dot { width:8px; height:8px; border-radius:50%; background:var(--gold); display:inline-block; animation:pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.8)} }
+    h1 {
+      font-family:'Playfair Display',serif; font-size:clamp(2.4rem,6vw,5rem); font-weight:900; line-height:1.05;
+      background:linear-gradient(135deg,#e8c97a 0%,#c9a84c 50%,#a07830 100%);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-bottom:16px;
+    }
+    .tagline { color:var(--muted); font-size:1.05rem; font-weight:300; max-width:500px; margin:0 auto 36px; }
+
+    /* TOOLBAR */
+    .toolbar { display:flex; flex-wrap:wrap; gap:12px; justify-content:center; max-width:800px; margin:0 auto; position:relative; z-index:1; }
+    .search-wrap { position:relative; flex:1; min-width:240px; }
+    .search-icon { position:absolute; left:14px; top:50%; transform:translateY(-50%); color:var(--muted); pointer-events:none; }
+    input[type=text] {
+      width:100%; padding:12px 16px 12px 42px; background:var(--card); border:1px solid var(--border);
+      border-radius:var(--radius); color:var(--text); font-family:'DM Sans',sans-serif; font-size:.95rem; outline:none; transition:border-color .2s;
+    }
+    input[type=text]:focus { border-color:var(--gold); }
+    .filters { display:flex; gap:8px; flex-wrap:wrap; }
+    .filter-btn {
+      padding:10px 18px; border-radius:999px; border:1px solid var(--border);
+      background:var(--card); color:var(--muted); font-family:'DM Sans',sans-serif; font-size:.85rem; cursor:pointer; transition:all .2s;
+    }
+    .filter-btn:hover,.filter-btn.active { border-color:var(--gold); color:var(--gold-light); background:rgba(201,168,76,.08); }
+
+    /* LAYOUT */
+    .page-body { display:flex; max-width:1300px; margin:0 auto; padding:48px 24px 80px; align-items:flex-start; }
+    .catalog-col { flex:1; min-width:0; }
+    .section-label { font-size:.75rem; letter-spacing:.18em; text-transform:uppercase; color:var(--gold); margin-bottom:28px; display:flex; align-items:center; gap:12px; }
+    .section-label::after { content:''; flex:1; height:1px; background:var(--border); }
+
+    /* GRID */
+    .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:18px; }
+    .card {
+      background:var(--card); border:1px solid var(--border); border-radius:var(--radius);
+      overflow:hidden; transition:transform .22s,border-color .22s,box-shadow .22s;
+      display:flex; flex-direction:column; animation:fadeUp .5s ease both;
+    }
+    .card:hover { transform:translateY(-4px); border-color:rgba(201,168,76,.4); box-shadow:0 12px 40px rgba(0,0,0,.5); }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+    .card-emoji { width:100%; aspect-ratio:4/3; background:var(--surface); display:flex; align-items:center; justify-content:center; font-size:3rem; }
+    .card-body { padding:16px; display:flex; flex-direction:column; flex:1; }
+    .card-cat { font-size:.7rem; letter-spacing:.14em; text-transform:uppercase; color:var(--gold); margin-bottom:6px; }
+    .card-name { font-family:'Playfair Display',serif; font-size:1.05rem; font-weight:700; color:var(--text); margin-bottom:6px; line-height:1.3; }
+    .card-desc { font-size:.82rem; color:var(--muted); line-height:1.55; margin-bottom:14px; flex:1; }
+    .card-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+    .price { font-size:1.25rem; font-weight:500; color:var(--gold-light); }
+    .price sup { font-size:.7rem; vertical-align:super; font-weight:300; }
+    .badge { font-size:.7rem; padding:3px 9px; border-radius:999px; background:rgba(201,168,76,.12); color:var(--gold); border:1px solid rgba(201,168,76,.25); }
+    .badge.agotado { background:rgba(255,80,80,.1); color:#ff6060; border-color:rgba(255,80,80,.25); }
+    .card-actions { display:flex; flex-direction:column; gap:8px; }
+    .btn {
+      width:100%; padding:9px 14px; border-radius:8px; border:none;
+      font-family:'DM Sans',sans-serif; font-size:.82rem; font-weight:500; cursor:pointer;
+      display:flex; align-items:center; justify-content:center; gap:7px; transition:all .2s;
+    }
+    .btn:disabled { opacity:.4; cursor:not-allowed; }
+    .btn-wa { background:#1aad50; color:#fff; }
+    .btn-wa:hover:not(:disabled) { background:#128a3e; }
+    .btn-cart { background:rgba(201,168,76,.12); color:var(--gold-light); border:1px solid rgba(201,168,76,.3); }
+    .btn-cart:hover:not(:disabled) { background:rgba(201,168,76,.22); }
+    .btn-cart.added { background:rgba(201,168,76,.25); }
+
+    /* CARRITO SIDEBAR */
+    .cart-col { width:320px; flex-shrink:0; margin-left:28px; position:sticky; top:24px; }
+    .cart-box { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; }
+    .cart-header { padding:18px 20px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+    .cart-title { font-family:'Playfair Display',serif; font-size:1.1rem; color:var(--text); display:flex; align-items:center; gap:10px; }
+    .cart-count { background:var(--gold); color:#000; font-size:.72rem; font-weight:700; font-family:'DM Sans',sans-serif; width:20px; height:20px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; }
+    .cart-clear { font-size:.75rem; color:var(--muted); cursor:pointer; background:none; border:none; font-family:'DM Sans',sans-serif; transition:color .2s; }
+    .cart-clear:hover { color:#ff6060; }
+    .cart-empty { padding:40px 20px; text-align:center; color:var(--muted); font-size:.88rem; line-height:1.6; }
+    .cart-items { padding:12px; display:flex; flex-direction:column; gap:10px; max-height:380px; overflow-y:auto; }
+    .cart-items::-webkit-scrollbar { width:4px; }
+    .cart-items::-webkit-scrollbar-thumb { background:var(--border); border-radius:4px; }
+    .cart-item { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:12px; display:flex; gap:10px; align-items:center; }
+    .ci-emoji { font-size:1.6rem; width:38px; text-align:center; flex-shrink:0; }
+    .ci-info { flex:1; min-width:0; }
+    .ci-name { font-size:.85rem; font-weight:500; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .ci-price { font-size:.78rem; color:var(--gold); margin-top:2px; }
+    .qty-ctrl { display:flex; align-items:center; gap:6px; margin-top:6px; }
+    .qty-btn { width:22px; height:22px; border-radius:6px; border:1px solid var(--border); background:var(--card); color:var(--text); font-size:.9rem; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:border-color .15s; }
+    .qty-btn:hover { border-color:var(--gold); color:var(--gold); }
+    .qty-num { font-size:.85rem; font-weight:500; min-width:18px; text-align:center; }
+    .ci-remove { background:none; border:none; color:var(--muted); cursor:pointer; font-size:1rem; padding:4px; border-radius:6px; transition:color .15s; line-height:1; }
+    .ci-remove:hover { color:#ff6060; }
+    .cart-footer { border-top:1px solid var(--border); padding:16px; }
+    .cart-total { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
+    .cart-total-label { font-size:.85rem; color:var(--muted); }
+    .cart-total-amount { font-size:1.2rem; font-weight:600; color:var(--gold-light); }
+    .btn-wa-cart {
+      width:100%; padding:13px 16px; border-radius:10px; border:none;
+      background:var(--green); color:#fff; font-family:'DM Sans',sans-serif; font-size:.9rem; font-weight:600;
+      cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition:background .2s,transform .15s;
+    }
+    .btn-wa-cart:hover { background:#1aad50; transform:scale(1.01); }
+
+    /* EMPTY */
+    .empty { text-align:center; padding:80px 20px; color:var(--muted); display:none; }
+
+    /* FAB MOBILE */
+    .cart-fab {
+      display:none; position:fixed; bottom:28px; right:28px;
+      background:var(--gold); color:#000; border:none; border-radius:999px;
+      padding:14px 20px; font-family:'DM Sans',sans-serif; font-size:.9rem; font-weight:700;
+      cursor:pointer; align-items:center; gap:8px; box-shadow:0 6px 24px rgba(201,168,76,.4); z-index:200; transition:transform .2s;
+    }
+    .cart-fab:hover { transform:scale(1.04); }
+    .fab-badge { background:#000; color:var(--gold); border-radius:999px; font-size:.72rem; padding:2px 7px; }
+
+    /* DRAWER */
+    .drawer-overlay { position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:300; backdrop-filter:blur(2px); opacity:0; pointer-events:none; transition:opacity .3s; }
+    .drawer {
+      position:fixed; right:0; top:0; bottom:0; width:min(360px,100vw);
+      background:var(--card); z-index:301; transform:translateX(100%); transition:transform .3s ease;
+      display:flex; flex-direction:column;
+    }
+    .drawer.open { transform:translateX(0); }
+    .drawer-close {
+      position:absolute; top:14px; right:14px; background:var(--surface);
+      border:1px solid var(--border); border-radius:8px; color:var(--text);
+      width:32px; height:32px; cursor:pointer; font-size:1.1rem; display:flex; align-items:center; justify-content:center;
+    }
+    .drawer-inner { flex:1; overflow-y:auto; padding:20px 16px 0; }
+    .drawer-footer { padding:16px; border-top:1px solid var(--border); }
+
+    /* TOAST */
+    .toast {
+      position:fixed; bottom:90px; left:50%; transform:translateX(-50%) translateY(20px);
+      background:var(--card); border:1px solid var(--gold); color:var(--gold-light);
+      padding:10px 20px; border-radius:999px; font-size:.85rem; font-weight:500;
+      opacity:0; pointer-events:none; transition:all .3s; z-index:400; white-space:nowrap;
+    }
+    .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+    footer { border-top:1px solid var(--border); padding:32px 24px; text-align:center; color:var(--muted); font-size:.85rem; }
+    footer strong { color:var(--gold); }
+
+    @media(max-width:900px) { .cart-col{display:none} .cart-fab{display:flex} }
+    @media(max-width:600px) { header{padding:60px 20px 48px} .page-body{padding:32px 16px 100px} }
+  </style>
+</head>
+<body>
+
+<!-- HERO -->
+<header>
+  <div class="logo-badge"><span class="dot"></span> Catálogo en línea</div>
+  <h1>Lorvas Distribuidora</h1>
+  <p class="tagline">Calidad y variedad en cada producto. Encuentra lo que necesitas.</p>
+  <div class="toolbar">
+    <div class="search-wrap">
+      <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <input type="text" id="searchInput" placeholder="Buscar producto…" oninput="filterProducts()" />
+    </div>
+    <div class="filters" id="filterBtns"></div>
+  </div>
+</header>
+
+<!-- CONTENIDO -->
+<div class="page-body">
+  <div class="catalog-col">
+    <div class="section-label" id="sectionLabel">Todos los productos</div>
+    <div class="grid" id="productGrid"></div>
+    <div class="empty" id="emptyState">
+      <p>No se encontraron productos.</p>
+    </div>
+  </div>
+  <aside class="cart-col">
+    <div class="cart-box" id="cartBox"></div>
+  </aside>
+</div>
+
+<!-- DRAWER MÓVIL -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="cartDrawer">
+  <button class="drawer-close" onclick="closeDrawer()">✕</button>
+  <div class="drawer-inner" id="drawerInner"></div>
+  <div class="drawer-footer" id="drawerFooter"></div>
+</div>
+
+<!-- FAB MÓVIL -->
+<button class="cart-fab" id="cartFab" onclick="openDrawer()">
+  🛒 Mi carrito <span class="fab-badge" id="fabBadge">0</span>
+</button>
+
+<div class="toast" id="toast"></div>
+
+<footer>
+  <strong>Lorvas Distribuidora</strong> &nbsp;·&nbsp; Precios en USD &nbsp;·&nbsp; Sujeto a disponibilidad
+</footer>
+
+<script>
+var WA = '50372194538';
+
+// =========================================================
+//  EDITA AQUÍ TUS PRODUCTOS
+//  stock: 'disponible'  |  'agotado'  |  'oferta'
+// =========================================================
+var products = [
+  { name:'Producto Ejemplo 1', category:'Categoría A', desc:'Descripción breve. Cambia esto por los detalles reales de tu producto.', price:9.99,  emoji:'📦', stock:'disponible' },
+  { name:'Producto Ejemplo 2', category:'Categoría A', desc:'Agrega marca, medida, cantidad u otros detalles importantes.', price:14.50, emoji:'🛍️', stock:'oferta' },
+  { name:'Producto Ejemplo 3', category:'Categoría B', desc:'Duplica este bloque para agregar tantos productos como necesites.', price:5.25,  emoji:'✨', stock:'disponible' },
+  { name:'Producto Ejemplo 4', category:'Categoría B', desc:'Si ya no tienes existencia, cambia stock a agotado.', price:22.00, emoji:'🔒', stock:'agotado' },
+  { name:'Producto Ejemplo 5', category:'Categoría C', desc:'Usa el emoji que mejor represente cada producto.', price:3.75,  emoji:'⚡', stock:'disponible' },
+  { name:'Producto Ejemplo 6', category:'Categoría C', desc:'Los pedidos llegarán directo a tu WhatsApp configurado.', price:18.00, emoji:'🎯', stock:'oferta' }
+];
+// =========================================================
+
+var cart = [];
+var activeCategory = 'Todos';
+
+function getCartItem(name) {
+  for (var i = 0; i < cart.length; i++) { if (cart[i].name === name) return cart[i]; }
+  return null;
+}
+
+function addToCart(name) {
+  var p = null;
+  for (var i = 0; i < products.length; i++) { if (products[i].name === name) { p = products[i]; break; } }
+  if (!p || p.stock === 'agotado') return;
+  var ex = getCartItem(name);
+  if (ex) { ex.qty++; } else { cart.push({ name: p.name, price: p.price, emoji: p.emoji, qty: 1 }); }
+  renderCart();
+  render();
+  showToast('✓ ' + p.name + ' agregado');
+}
+
+function removeFromCart(name) {
+  var next = [];
+  for (var i = 0; i < cart.length; i++) { if (cart[i].name !== name) next.push(cart[i]); }
+  cart = next;
+  renderCart(); render();
+}
+
+function changeQty(name, delta) {
+  var item = getCartItem(name);
+  if (!item) return;
+  item.qty += delta;
+  if (item.qty <= 0) removeFromCart(name); else { renderCart(); render(); }
+}
+
+function clearCart() { cart = []; renderCart(); render(); }
+
+function cartTotal() {
+  var t = 0;
+  for (var i = 0; i < cart.length; i++) t += cart[i].price * cart[i].qty;
+  return t.toFixed(2);
+}
+
+function cartCount() {
+  var c = 0;
+  for (var i = 0; i < cart.length; i++) c += cart[i].qty;
+  return c;
+}
+
+function waProduct(name) {
+  var msg = 'Hola, quiero el producto: ' + name + '. ¿Está disponible?';
+  window.open('https://wa.me/' + WA + '?text=' + encodeURIComponent(msg), '_blank');
+}
+
+function waCart() {
+  if (!cart.length) return;
+  var lines = '';
+  for (var i = 0; i < cart.length; i++) {
+    var it = cart[i];
+    lines += '\n• ' + it.emoji + ' ' + it.name + ' x' + it.qty + ' — $' + (it.price * it.qty).toFixed(2);
+  }
+  var msg = 'Hola, quiero pedir los siguientes productos:\n' + lines + '\n\nTotal estimado: $' + cartTotal() + '\n\n¿Me pueden ayudar con mi pedido?';
+  window.open('https://wa.me/' + WA + '?text=' + encodeURIComponent(msg), '_blank');
+}
+
+function cartItemsHTML() {
+  var html = '';
+  for (var i = 0; i < cart.length; i++) {
+    var it = cart[i];
+    var idx = i; // captura índice para closure
+    html += '<div class="cart-item">'
+      + '<div class="ci-emoji">' + it.emoji + '</div>'
+      + '<div class="ci-info">'
+      +   '<div class="ci-name">' + it.name + '</div>'
+      +   '<div class="ci-price">$' + it.price.toFixed(2) + ' c/u</div>'
+      +   '<div class="qty-ctrl">'
+      +     '<button class="qty-btn" data-action="minus" data-name="' + encodeURIComponent(it.name) + '">−</button>'
+      +     '<span class="qty-num">' + it.qty + '</span>'
+      +     '<button class="qty-btn" data-action="plus" data-name="' + encodeURIComponent(it.name) + '">+</button>'
+      +   '</div>'
+      + '</div>'
+      + '<button class="ci-remove" data-action="remove" data-name="' + encodeURIComponent(it.name) + '">✕</button>'
+      + '</div>';
+  }
+  return html;
+}
+
+function cartHTML(forDrawer) {
+  var count = cartCount();
+  var html = '<div class="cart-header">'
+    + '<div class="cart-title">🛒 Mi Carrito <span class="cart-count">' + count + '</span></div>'
+    + (count > 0 ? '<button class="cart-clear" onclick="clearCart()">Vaciar</button>' : '')
+    + '</div>';
+
+  if (count === 0) {
+    html += '<div class="cart-empty">Tu carrito está vacío.<br>Agrega productos para hacer tu pedido.</div>';
+    return { main: html, footer: '' };
+  }
+
+  var itemsStyle = forDrawer ? 'max-height:none' : '';
+  html += '<div class="cart-items" style="' + itemsStyle + '">' + cartItemsHTML() + '</div>';
+
+  var footer = '<div class="cart-total">'
+    + '<span class="cart-total-label">Total estimado</span>'
+    + '<span class="cart-total-amount">$' + cartTotal() + '</span>'
+    + '</div>'
+    + '<button class="btn-wa-cart" onclick="waCart()">&#128233; Pedir por WhatsApp</button>';
+
+  return { main: html, footer: footer };
+}
+
+function renderCart() {
+  var count = cartCount();
+
+  // Desktop
+  var r = cartHTML(false);
+  var box = document.getElementById('cartBox');
+  box.innerHTML = r.main + (r.footer ? '<div class="cart-footer">' + r.footer + '</div>' : '');
+
+  // Drawer
+  var rd = cartHTML(true);
+  document.getElementById('drawerInner').innerHTML = rd.main;
+  document.getElementById('drawerFooter').innerHTML = rd.footer;
+
+  // FAB
+  document.getElementById('fabBadge').textContent = count;
+  document.getElementById('cartFab').style.display = count > 0 ? 'flex' : 'none';
+
+  // Delegated events
+  bindCartEvents(document.getElementById('cartBox'));
+  bindCartEvents(document.getElementById('drawerInner'));
+}
+
+function bindCartEvents(container) {
+  if (!container) return;
+  var btns = container.querySelectorAll('[data-action]');
+  for (var i = 0; i < btns.length; i++) {
+    (function(btn) {
+      btn.onclick = function() {
+        var name = decodeURIComponent(btn.getAttribute('data-name'));
+        var action = btn.getAttribute('data-action');
+        if (action === 'plus')   changeQty(name, 1);
+        if (action === 'minus')  changeQty(name, -1);
+        if (action === 'remove') removeFromCart(name);
+      };
+    })(btns[i]);
+  }
+}
+
+function openDrawer() {
+  document.getElementById('cartDrawer').classList.add('open');
+  document.getElementById('drawerOverlay').style.opacity = '1';
+  document.getElementById('drawerOverlay').style.pointerEvents = 'auto';
+}
+
+function closeDrawer() {
+  document.getElementById('cartDrawer').classList.remove('open');
+  document.getElementById('drawerOverlay').style.opacity = '0';
+  document.getElementById('drawerOverlay').style.pointerEvents = 'none';
+}
+
+var toastTimer = null;
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function() { t.classList.remove('show'); }, 2400);
+}
+
+function buildFilters() {
+  var seen = {};
+  var cats = ['Todos'];
+  for (var i = 0; i < products.length; i++) {
+    var c = products[i].category;
+    if (!seen[c]) { seen[c] = true; cats.push(c); }
+  }
+  var html = '';
+  for (var j = 0; j < cats.length; j++) {
+    html += '<button class="filter-btn' + (j === 0 ? ' active' : '') + '" data-cat="' + cats[j] + '">' + cats[j] + '</button>';
+  }
+  document.getElementById('filterBtns').innerHTML = html;
+
+  var btns = document.getElementById('filterBtns').querySelectorAll('.filter-btn');
+  for (var k = 0; k < btns.length; k++) {
+    (function(btn) {
+      btn.onclick = function() {
+        activeCategory = btn.getAttribute('data-cat');
+        var all = document.querySelectorAll('.filter-btn');
+        for (var x = 0; x < all.length; x++) all[x].classList.remove('active');
+        btn.classList.add('active');
+        document.getElementById('sectionLabel').textContent = activeCategory === 'Todos' ? 'Todos los productos' : activeCategory;
+        render();
+      };
+    })(btns[k]);
+  }
+}
+
+function filterProducts() { render(); }
+
+function render() {
+  var q = document.getElementById('searchInput').value.toLowerCase();
+  var filtered = [];
+  for (var i = 0; i < products.length; i++) {
+    var p = products[i];
+    var matchCat = activeCategory === 'Todos' || p.category === activeCategory;
+    var matchQ   = p.name.toLowerCase().indexOf(q) >= 0 || p.desc.toLowerCase().indexOf(q) >= 0;
+    if (matchCat && matchQ) filtered.push(p);
+  }
+
+  var grid  = document.getElementById('productGrid');
+  var empty = document.getElementById('emptyState');
+
+  if (!filtered.length) { grid.innerHTML = ''; empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+
+  var html = '';
+  for (var j = 0; j < filtered.length; j++) {
+    var p       = filtered[j];
+    var agotado = p.stock === 'agotado';
+    var badge   = agotado ? 'Agotado' : (p.stock === 'oferta' ? 'Oferta' : 'Disponible');
+    var inCart  = getCartItem(p.name);
+    var eName   = encodeURIComponent(p.name);
+    var dis     = agotado ? ' disabled' : '';
+    var delay   = (j * 0.06).toFixed(2);
+
+    html += '<div class="card" style="animation-delay:' + delay + 's">'
+      + '<div class="card-emoji">' + p.emoji + '</div>'
+      + '<div class="card-body">'
+      +   '<div class="card-cat">' + p.category + '</div>'
+      +   '<div class="card-name">' + p.name + '</div>'
+      +   '<div class="card-desc">' + p.desc + '</div>'
+      +   '<div class="card-row">'
+      +     '<div class="price"><sup>$</sup>' + p.price.toFixed(2) + '</div>'
+      +     '<span class="badge ' + (agotado ? 'agotado' : '') + '">' + badge + '</span>'
+      +   '</div>'
+      +   '<div class="card-actions">'
+      +     '<button class="btn btn-wa" data-wa="' + eName + '"' + dis + '>&#128233; Pedir por WhatsApp</button>'
+      +     '<button class="btn btn-cart ' + (inCart ? 'added' : '') + '" data-cart="' + eName + '"' + dis + '>'
+      +       (inCart ? '✓ En carrito (' + inCart.qty + ')' : '&#128722; Agregar al carrito')
+      +     '</button>'
+      +   '</div>'
+      + '</div>'
+      + '</div>';
+  }
+  grid.innerHTML = html;
+
+  // eventos de tarjetas
+  var wabtns   = grid.querySelectorAll('[data-wa]');
+  var cartbtns = grid.querySelectorAll('[data-cart]');
+  for (var a = 0; a < wabtns.length; a++) {
+    (function(btn) {
+      btn.onclick = function() { waProduct(decodeURIComponent(btn.getAttribute('data-wa'))); };
+    })(wabtns[a]);
+  }
+  for (var b = 0; b < cartbtns.length; b++) {
+    (function(btn) {
+      btn.onclick = function() { addToCart(decodeURIComponent(btn.getAttribute('data-cart'))); };
+    })(cartbtns[b]);
+  }
+}
+
+// INICIO
+buildFilters();
+render();
+renderCart();
+</script>
+</body>
+</html>
